@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/todo")
+@RequestMapping("/todo/tasks")
 @Slf4j
 public class TaskController {
 
@@ -20,39 +20,49 @@ public class TaskController {
     TaskService taskService;
 
 
-    @PostMapping("/tasks")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Task createTask(@RequestBody Task task) {
+    public ResponseEntity<?> createTask(@RequestBody Task task) {
         log.info("Create new Task [{}]", task);
-        return taskService.createTask(task);
+        taskService.createTask(task);
+        return new ResponseEntity<Void>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/tasks")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Task> getAllTasks() {
+    public ResponseEntity<List<Task>> getAllTasks() {
         log.info("List of all Tasks");
-        return taskService.getAllTasks();
+        return new ResponseEntity<List<Task>>(taskService.getAllTasks(), HttpStatus.OK);
     }
 
-    @GetMapping("/tasks/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Task> getTaskById(@PathVariable(value = "id") Long id) {
         log.info("find Task by id [{}]", id);
-        return taskService.findTaskById(id);
+        return taskService.findTaskById(id)
+                .map(task -> ResponseEntity.ok().body(task))
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/tasks/{id}")
+
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Task> updateTaskById(@RequestBody Task task, @PathVariable(value = "id") Long id) {
-        log.info("update a Task by id [{}], new information is: [{}]",id, task);
-        return taskService.updateTaskById(task, id);
+    public ResponseEntity<?> updateTaskById(@RequestBody Task task, @PathVariable(value = "id") Long id) {
+        log.info("update a Task by id [{}], new information is: [{}]", id, task);
+        taskService.updateTaskById(task, id);
+        return new ResponseEntity<Void>(HttpStatus.OK);
+
     }
 
-    @DeleteMapping("/tasks/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Object> deleteTaskById(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<?> deleteTaskById(@PathVariable(value = "id") Long id) {
         log.info("Deleting Task with id [{}]", id);
-        return taskService.deleteById(id);
+        return taskService.findTaskById(id)
+                .map(taskToDelete -> {
+                    taskService.deleteById(id);
+                    return ResponseEntity.noContent().build();
+                }).orElse(ResponseEntity.notFound().build());
     }
 
 

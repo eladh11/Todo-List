@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Component
@@ -22,28 +23,34 @@ public class Test implements CommandLineRunner {
         createTasks();
     }
 
+    //todo - instarnal factor util
     public void createTasks() {
-        Task t1 = new Task();
-        t1.setTitle("first Task 1");
-        t1.setDescription("first description...");
-        t1.setDeadLine(convertUtilDateToSQL(new Date(2023, 01, 01)));
+
+        LocalDateTime time = LocalDateTime.now();
+        Task t1 = Task.builder().title("first Task 1").description("first description...")
+                .deadLine(convertUtilDateToSQL(new Date(time.getYear() + 1, time.getMonthValue()
+                        , time.getDayOfMonth()))).build();
 
         taskRepository.save(t1);
-        Task t2 = new Task();
-        t2.setTitle("seconde Task 1");
-        t2.setDescription("seconde description...");
-        t2.setDeadLine(convertUtilDateToSQL(new Date(2023, 01, 01)));
+
+
+        Task t2 = Task.builder().title("seconde Task 2").description("seconde description...")
+                .deadLine(convertUtilDateToSQL(new Date(time.getYear() + 1, time.getMonthValue(),
+                        time.getDayOfMonth()))).build();
+
 
         taskRepository.save(t2);
-        Task t3 = new Task();
-        t3.setTitle("third Task 1");
-        t3.setDescription("third description...");
-        t3.setDeadLine(convertUtilDateToSQL(new Date(2023, 01, 01)));
+
+
+        Task t3 = Task.builder().title("third Task 3").description("third description...")
+                .deadLine(convertUtilDateToSQL(new Date(time.getYear() + 1, time.getMonthValue(),
+                        time.getDayOfMonth()))).build();
 
         taskRepository.save(t3);
 
     }
 
+    //todo - remove to util
     public java.sql.Date convertUtilDateToSQL(java.util.Date date) {
         return new java.sql.Date(date.getYear() - 1900, date.getMonth() - 1, date.getDay() + 1);
     }
