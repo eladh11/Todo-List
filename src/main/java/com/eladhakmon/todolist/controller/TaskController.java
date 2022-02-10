@@ -49,8 +49,14 @@ public class TaskController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> updateTaskById(@RequestBody Task task, @PathVariable(value = "id") Long id) {
         log.info("update a Task by id [{}], new information is: [{}]", id, task);
-        taskService.updateTaskById(task, id);
-        return new ResponseEntity<Void>(HttpStatus.OK);
+        return taskService.findTaskById(id)
+                .map(taskToUpdate -> {
+                    taskToUpdate.setTitle(task.getTitle());
+                    taskToUpdate.setDescription(task.getDescription());
+                    taskToUpdate.setDeadLine(task.getDeadLine());
+                    taskService.updateTaskById(taskToUpdate, id);
+                    return ResponseEntity.ok().body(taskToUpdate);
+                }).orElse(ResponseEntity.notFound().build());
 
     }
 

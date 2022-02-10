@@ -4,19 +4,17 @@ import com.eladhakmon.todolist.db.TaskDB;
 import com.eladhakmon.todolist.model.Task;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-//todo - adding interface implementation
 @Service
 @RequiredArgsConstructor
 public class TaskService {
 
     @Autowired
-    private TaskDB taskDB;
+    protected TaskDB taskDB;
 
     public void createTask(Task task) {
         taskDB.createTask(task);
@@ -34,14 +32,17 @@ public class TaskService {
 
 
     public void updateTaskById(Task task, Long id) {
-        taskDB.findTaskById(id)
-                .map(taskToUpdate -> {
-                    taskToUpdate.setTitle(task.getTitle());
-                    taskToUpdate.setDescription(task.getDescription());
-                    taskToUpdate.setDeadLine(task.getDeadLine());
-                    taskDB.updateTaskById(taskToUpdate);
-                    return ResponseEntity.ok().body(taskToUpdate);
-                }).orElse(ResponseEntity.notFound().build());
+        try {
+            List<Task> tasks = taskDB.getAllTasks();
+            for (Task t : tasks) {
+                if (t.getId() == id) {
+                    taskDB.updateTaskById(task);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     public void deleteById(Long id) {

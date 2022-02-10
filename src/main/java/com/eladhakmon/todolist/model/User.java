@@ -4,7 +4,6 @@ package com.eladhakmon.todolist.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,10 +11,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
- public class User {
+public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -25,8 +24,5 @@ import java.util.List;
     private String password;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @ToString.Exclude
-    private List<Task> tasks = new ArrayList<>();
-
-
+    private List<Task> tasks;
 }
