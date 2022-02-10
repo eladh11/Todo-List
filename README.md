@@ -7,4 +7,5 @@ This series of videos will develop a simple application to any list (task list),
 - Java 11
 - Spring
 - MySql
+- Postman
 - Swagger, Heroku and Postresql will be added later...
